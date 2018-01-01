@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+        					http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd">
+
+
+
+	<!-- For times when you just need to invoke a method on a specific object -->
+	<bean id="simpleJobDetail" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject" ref="currentStockUpdater" />
+		<property name="targetMethod" value="getStocks" />
+	</bean>
+	
+	<!-- For times when you just need to invoke a method on a specific object -->
+	<bean id="simpleJobDetail2" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject" ref="scoreUpdater" />
+		<property name="targetMethod" value="updateScore" />
+	</bean>
+	
+	<!-- For times when you just need to invoke a method on a specific object -->
+	<bean id="simpleJobDetail3" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject" ref="IsChangableUpdater" />
+		<property name="targetMethod" value="update" />
+	</bean>
+
+
+	
+
+
+	<!-- Run the job every 5 minute with initial delay of 5 second -->
+	<bean id="simpleTrigger"  class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
+		<property name="jobDetail" ref="simpleJobDetail" />
+		<property name="startDelay" value="5000" />
+		<property name="repeatInterval" value="300000" />
+	</bean>
+
+
+	
+	
+	<!-- update scores in given time -->
+	<bean id="cronTrigger2"  class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail" ref="simpleJobDetail2" />
+		<property name="cronExpression" value="0 36 3 1/1 * ? *" />
+		
+	</bean>
+	
+	<!-- update ischangable values in given time -->
+	<bean id="cronTrigger3"  class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail" ref="simpleJobDetail3" />
+		<property name="cronExpression" value="0 35 3 1/1 * ? *" />
+		
+	</bean>
+
+
+	<!-- Scheduler factory bean to glue together jobDetails and triggers to Configure Quartz Scheduler -->
+	<bean  class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+		<property name="jobDetails">
+			<list>
+				<ref bean="simpleJobDetail" />
+				<ref bean="simpleJobDetail2" />
+				<ref bean="simpleJobDetail3" />
+			</list>
+		</property>
+
+		<property name="triggers">
+			<list>
+				<ref bean="simpleTrigger" />
+				<ref bean="cronTrigger2" />
+				<ref bean="cronTrigger3" />
+			</list>
+		</property>
+	</bean>
+
+
+</beans>
